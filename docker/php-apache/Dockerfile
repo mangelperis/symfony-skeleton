@@ -4,6 +4,8 @@ ENV APACHE_DOCUMENT_ROOT=/var/www/html/public
 ENV PHP_INI_DIR=/usr/local/etc/php
 RUN sed -ri -e 's!/var/www/html!${APACHE_DOCUMENT_ROOT}!g' /etc/apache2/sites-available/*.conf
 RUN sed -ri -e 's!/var/www/!${APACHE_DOCUMENT_ROOT}!g' /etc/apache2/apache2.conf /etc/apache2/conf-available/*.conf
+RUN mkdir -p "/etc/apache2/${APACHE_LOG_DIR}" \
+     && chmod -R 744 "/etc/apache2/${APACHE_LOG_DIR}/"
 
 #Install System Packages
 RUN apt-get -y update && apt-get install -y git libicu-dev libzip-dev zip libjpeg-dev libpng-dev libfreetype6-dev libpcre3 libpcre3-dev \

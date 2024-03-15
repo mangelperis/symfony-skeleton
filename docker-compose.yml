@@ -1,25 +1,29 @@
-version: '3.5'
+version: '3.8'
 
 services:
     php-apache:
+        env_file:
+            - .env
         container_name: "${CONTAINER_NAME_PREFIX}-php-apache"
-        build: php-apache
+        build: docker/php-apache
         #REQUIRED ONLY ON LINUX!!
         extra_hosts:
             - host.docker.internal:host-gateway
         volumes:
             - ${PATH_TO_SYMFONY_PROJECT}:/var/www/html
-            - ${APACHE_LOG_DIR}:/var/log/apache2
+            - ${APACHE_LOG_DIR}:/etc/apache2/${APACHE_LOG_DIR}
         ports:
             - "80:80"
         networks:
             - symfony
     mariadb:
+        env_file:
+            - .env
         container_name: "${CONTAINER_NAME_PREFIX}-mariadb"
         image: mariadb:11.1.4
         volumes:
             - ${PATH_TO_DB_DATA}:/var/lib/mysql:rw
-            - ./mariadb/mariadb.cnf:/etc/mysql/my.cnf
+            - ./docker/mariadb/mariadb.cnf:/etc/mysql/my.cnf
             # CUSTOM Users Script to add your users (optional)
             #- ./config/users.sql:/docker-entrypoint-initdb.d/users.sql
         environment:
@@ -33,6 +37,8 @@ services:
         networks:
             - symfony
 #    mailer:
+#        env_file:
+#            - .env
 #        container_name: "${CONTAINER_NAME_PREFIX}-mailer"
 #        image: schickling/mailcatcher
 #        ports:
@@ -41,6 +47,8 @@ services:
 #        networks:
 #            - symfony
 #    adminer:
+#        env_file:
+#            - .env
 #        container_name: "${CONTAINER_NAME_PREFIX}-adminer"
 #        image: adminer
 #        ports:
