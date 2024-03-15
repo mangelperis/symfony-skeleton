@@ -1,0 +1,2 @@
+# symfony-skeleton
+Symfony base
