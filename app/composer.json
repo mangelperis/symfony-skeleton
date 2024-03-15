@@ -61,8 +61,7 @@
         ],
         "setup": [
             "composer run build",
-            "composer run up",
-            "composer run logs"
+            "composer run up"
         ],
         "up": [
             "docker compose up -d"
