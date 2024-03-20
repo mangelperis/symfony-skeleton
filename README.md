@@ -27,7 +27,11 @@ cp ./docker/.env.dist .env
 ```
 ### Run using composer
 
-`composer run` commands are provided as **shortcuts**. Available commands are:
+`composer run` commands are provided as **shortcuts**.
+
+Use `composer run setup` to start and initialize all needed containers.
+
+Available commands are:
 ```
 composer run [
     setup             --- Build the docker images and run the containers in the background.
@@ -38,6 +42,7 @@ composer run [
     cache-clear       --- Execute Symfony clear cache command.
 ]
 ```
+
 A folder named `var` will be created in the project root folder upon the first run. This folder includes the database files and server logs to provide help while developing.
 
 ### Run using docker directly
