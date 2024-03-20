@@ -1,11 +1,6 @@
-FROM php:8.3.3-apache
+FROM php:8.3.3-fpm
 
-ENV APACHE_DOCUMENT_ROOT=/var/www/html/public
 ENV PHP_INI_DIR=/usr/local/etc/php
-RUN sed -ri -e 's!/var/www/html!${APACHE_DOCUMENT_ROOT}!g' /etc/apache2/sites-available/*.conf
-RUN sed -ri -e 's!/var/www/!${APACHE_DOCUMENT_ROOT}!g' /etc/apache2/apache2.conf /etc/apache2/conf-available/*.conf
-RUN mkdir -p "/etc/apache2/${APACHE_LOG_DIR}" \
-     && chmod -R 744 "/etc/apache2/${APACHE_LOG_DIR}/"
 
 #Install System Packages
 RUN apt-get -y update && apt-get install -y git libicu-dev libzip-dev zip libjpeg-dev libpng-dev libfreetype6-dev libpcre3 libpcre3-dev
@@ -23,10 +18,8 @@ RUN docker-php-ext-enable intl opcache pdo_mysql zip gd
 RUN pecl install xdebug \
     && docker-php-ext-enable xdebug
 
-RUN a2enmod rewrite
-
-#INI & CONF Files
-COPY /docker/php-apache/apache2.conf /etc/apache2/apache2.conf
+# INI-files
+COPY /docker/php-fpm/php-fpm.conf /usr/local/etc/php-fpm.d/zz-log.conf
 COPY /docker/extras/opcache.ini /usr/local/etc/php/conf.d/opcache.ini
 COPY /docker/extras/xdebug.ini /usr/local/etc/php/conf.d/docker-php-ext-xdebug.ini
 COPY /docker/extras/php.ini "$PHP_INI_DIR/php.ini"
@@ -39,7 +32,10 @@ RUN curl -sS https://getcomposer.org/installer | php -- --install-dir=/usr/local
 RUN curl -sS https://get.symfony.com/cli/installer | bash && mv /root/.symfony5/bin/symfony /usr/local/bin/symfony \
     && echo 'alias sf="php bin/console"' >> ~/.bashrc
 
-ENV HOST=0.0.0.0
+# Enable php-fmp log permission view from host machine
+ADD /docker/php-fpm/init.sh /usr/src/init.sh
+RUN chmod +x /usr/src/init.sh
 
-# Install NVM (optional)
-#RUN curl https://raw.githubusercontent.com/creationix/nvm/master/install.sh | bash
+WORKDIR /var/www
+EXPOSE 9000
+ENTRYPOINT ["/usr/src/init.sh","php-fpm","-F"]

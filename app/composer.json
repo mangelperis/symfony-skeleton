@@ -16,6 +16,7 @@
         "symfony/flex": "^2",
         "symfony/framework-bundle": "7.0.*",
         "symfony/http-client": "7.0.*",
+        "symfony/monolog-bundle": "^3.10",
         "symfony/runtime": "7.0.*",
         "symfony/validator": "7.0.*",
         "symfony/yaml": "7.0.*"
@@ -66,11 +67,17 @@
         "up": [
             "docker compose up -d"
         ],
+        "down": [
+            "docker compose down"
+        ],
         "build": [
             "docker compose build"
         ],
         "logs": [
             "docker compose logs -f"
+        ],
+        "cache-clear": [
+            "docker exec -t php-fpm bin/console cache:clear"
         ]
     },
     "conflict": {

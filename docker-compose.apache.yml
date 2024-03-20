@@ -1,10 +1,28 @@
 version: '3.8'
 
 services:
+    php-apache:
+        env_file:
+            - .env
+        container_name: "${CONTAINER_NAME_PREFIX}-php-apache"
+        build:
+            dockerfile: ./docker/php-apache/Dockerfile
+        #extra_hosts REQUIRED in Linux for xdebug!!
+        extra_hosts:
+            - host.docker.internal:host-gateway
+        ####
+        volumes:
+            - ${PATH_TO_SYMFONY_PROJECT}:/var/www/html
+            - ${APACHE_LOG_DIR}:/etc/apache2/${APACHE_LOG_DIR}
+        ports:
+            - "80:80"
+            - "443:443"
+        networks:
+            - symfony
     mariadb:
         env_file:
             - .env
-        container_name: mariadb
+        container_name: "${CONTAINER_NAME_PREFIX}-mariadb"
         image: mariadb:11.1.4
         volumes:
             - ${PATH_TO_DB_DATA}:/var/lib/mysql:rw
@@ -21,41 +39,6 @@ services:
             - "3306:3306"
         networks:
             - symfony
-
-    php-fpm:
-        env_file:
-            - .env
-        container_name: php-fpm
-        #extra_hosts REQUIRED in Linux for xdebug!!
-        extra_hosts:
-            - host.docker.internal:host-gateway
-        #######
-        build:
-            dockerfile: ./docker/php-fpm/Dockerfile
-        volumes:
-            - ${PATH_TO_SYMFONY_PROJECT}:/var/www
-            - ${FPM_LOG_DIR}:/var/log/php-fpm/
-        depends_on:
-            - mariadb
-        networks:
-            - symfony
-
-    nginx:
-        env_file:
-            - .env
-        container_name: nginx
-        build:
-            context: ./docker/nginx
-        volumes:
-            - ${PATH_TO_SYMFONY_PROJECT}:/var/www
-            - ${NGINX_LOG_DIR}:/var/log/nginx
-        ports:
-            - "80:80"
-            - "443:443"
-        networks:
-            - symfony
-
-
 #    mailer:
 #        env_file:
 #            - .env
