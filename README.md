@@ -1,4 +1,23 @@
 # Docker-Symfony-Stack
+
+## Table of Contents
+
+- [Description](#description)
+- [Infrastructure](#infrastructure-used)
+  - [Symfony Packages](#installed-symfony-packages)
+- [Getting Started](#getting-started)
+  - [Run using composer](#run-using-composer)
+  - [Run using docker](#run-using-docker)
+    - [Next steps](#important)
+    - [nginx or apache](#note)
+- [How it works?](#how-it-works)
+  - [API](#api)
+  - [PHPUnit Testing](#phpunit-testing)
+  - [xDebug](#xdebug-debugger)
+  - [Docker client host](#__client_host__-)
+- [Troubleshooting](#troubleshooting)
+
+## Description
 With this Docker-Symfony-Stack boilerplate, it's possible to set up a local development environment in seconds.
 
 ## Infrastructure used
@@ -7,24 +26,28 @@ With this Docker-Symfony-Stack boilerplate, it's possible to set up a local deve
   * PHP 8.3 (w/ opcache & [xDebug](#xdebug-debugger))
   * [Nginx / Apache](#note)
   * MariaDB 11.1.4
+  * Redis 7.2.4
   * Adminer (optional)
   * MailCatcher (optional)
 
-### Installed Symfony libraries
+### Installed Symfony Packages
 * **phpunit/phpunit**: testing framework for PHP
 * **doctrine/orm**: simplifies database interactions by mapping database tables to PHP objects.
 * **doctrine/doctrine-fixtures-bundle**: predefined sets of data used for testing or populating a database with initial data.
 * **symfony/http-client**: HTTP client for making HTTP requests and interacting with web services.
 * **symfony/validator**: tools for validating data according to predefined rules.
 * **symfony/maker-bundle**: facilitates rapid development by automating the creation of boilerplate code.
+* **phpstan/phpstan**: analysis tool for PHP code, to detect and fix issues,
 
 ***
 
 ## Getting Started
-Copy or rename the `.env.dist` file to an environment variable file and edit the entries to your needs:
+Copy or rename the `.env.dist` files (for docker and symfony) to an environment variable file and edit the entries to your needs:
 ```
+cp ./app/.env.dist .env
 cp ./docker/.env.dist .env
 ```
+
 ### Run using composer
 
 `composer run` commands are provided as **shortcuts**.
@@ -40,12 +63,14 @@ composer run [
     down              --- Stop the containers.
     logs              --- Show container sys logs (php-fpm, nginx, and MariaDB).
     cache-clear       --- Execute Symfony clear cache command.
+    stan              --- Execute PHPStan analyse command.
+    test              --- Execute PHPUnit test cases.    
 ]
 ```
 
 A folder named `var` will be created in the project root folder upon the first run. This folder includes the database files and server logs to provide help while developing.
 
-### Run using docker directly
+### Run using docker
 Alternatively to the use of `composer`, you can directly build & run the app by using the following docker commands:
 
 * Use `docker compose` to start your environment.
@@ -57,11 +82,19 @@ Alternatively to the use of `composer`, you can directly build & run the app by 
 docker-compose up -d --build
 ```
 
-#### NOTE
-Configurations to serve the project with either **NGINX** or **APACHE** servers are provided. By default, NGINX settings will be used.
-If you wish to use **APACHE** instead, **rename** the proper _**docker-compose.apache.yml**_ file or specify the target file while using the `up` command.
+#### IMPORTANT
+After booting the container, run `composer install` from outside or inside the container.
 ```
-docker compose -f docker-compose.apache.yml up --build
+docker exec -t php-fpm composer install
+```
+Then run the database migrations to create the mysql structure for both **dev** and **test** environments.
+```
+docker exec -t php-fpm php bin/console doctrine:migrations:migrate --env=dev --no-interaction
+```
+
+```
+docker exec -t php-fpm php bin/console doctrine:database:create --env=test --no-interaction
+docker exec -t php-fpm php bin/console doctrine:migrations:migrate --env=test --no-interaction
 ```
 
 After booting the container, you can use this command to enter inside it and execute commands (the container's name is defined in the _**docker-compose.yml**_ file):
@@ -72,11 +105,21 @@ or identify the name of it displayed under the column `NAMES` of this command ou
 ```
 docker ps
 ```
+There's an alias being created upon the build process, and it will allow you to execute the Symfony command directly only with `sf`. Example:
+```
+sf debug:router
+```
 
+#### Note
+Configurations to serve the project with either **NGINX** or **APACHE** servers are provided. By default, NGINX settings will be used.
+If you wish to use **APACHE** instead, **rename** the proper _**docker-compose.apache.yml**_ file or specify the target file while using the `up` command.
+```
+docker compose -f docker-compose.apache.yml up --build
+```
 ***
 
 ## How it works?
-You have up to 4 containers running depending on whether you choose to use nginx or apache: php-fpm + nginx or php-apache, mariadb, and optionally, adminer.
+You have up to 5 containers running depending on whether you choose to use nginx or apache: php-fpm + nginx or php-apache, mariadb, redis, and optionally, adminer.
 Check the running containers by using the command: ``docker ps``
 - [Symfony Web-App welcome page](http://localhost:80)
 - [Adminer [optional] (simple database manager)](http://localhost:8080)
@@ -84,12 +127,13 @@ Check the running containers by using the command: ``docker ps``
 
 #### API
 Use Postman or another CLI to perform actions on each endpoint.
+A [postman collection]() is provided with the project with the source data endpoint and the destination one.
 
 The list of available endpoints can be shown by executing (target **php-fpm** or **php-apache** container):
 ```
 docker exec php-fpm php bin/console debug:router
 ```
-Example (TO DO...)
+Provided endpoints are (Example):
 ```
 GET|HEAD  api/user/all                  List all users
 POST      api/user/create               Create a new user   
@@ -109,6 +153,11 @@ Additionally, run all the tests available using (target **php-fpm** or **php-apa
 ```
 docker exec php-fpm ./vendor/bin/phpunit --verbose
 ```
+or
+```
+composer test
+```
+
 ***
 
 #### xDebug debugger
