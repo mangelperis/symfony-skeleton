@@ -26,7 +26,7 @@ With this Docker-Symfony-Stack boilerplate, it's possible to set up a local deve
   * PHP 8.3 (w/ opcache & [xDebug](#xdebug-debugger))
   * [Nginx / Apache](#note)
   * MariaDB 11.1.4
-  * Redis 7.2.4
+  * Redis 7.2.4 (optional)
   * Adminer (optional)
   * MailCatcher (optional)
 

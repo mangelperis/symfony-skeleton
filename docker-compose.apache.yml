@@ -39,6 +39,21 @@ services:
             - "3306:3306"
         networks:
             - symfony
+
+#    redis:
+#        env_file:
+#            - .env
+#        build:
+#            context: ./docker/redis
+#        container_name: redis
+#        ports:
+#            - "6379:6379"
+#        volumes:
+#            - ${REDIS_DATA_DIR}:/data
+#        restart: always
+#        networks:
+#            - symfony
+
 #    mailer:
 #        env_file:
 #            - .env
