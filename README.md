@@ -44,8 +44,7 @@ With this Docker-Symfony-Stack boilerplate, it's possible to set up a local deve
 ## Getting Started
 Copy or rename the `.env.dist` files (for docker and symfony) to an environment variable file and edit the entries to your needs:
 ```
-cp ./app/.env.dist .env
-cp ./docker/.env.dist .env
+cp ./app/.env.dist ./app/.env && cp .env.dist .env
 ```
 
 ### Run using composer
@@ -79,7 +78,7 @@ Alternatively to the use of `composer`, you can directly build & run the app by 
   * Add the _keyword_ `down` to stop the containers.
 ```
 # Build & up. From the project's root folder exec
-docker-compose up -d --build
+docker compose up -d --build
 ```
 
 #### IMPORTANT
