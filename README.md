@@ -64,6 +64,7 @@ composer run [
     cache-clear       --- Execute Symfony clear cache command.
     stan              --- Execute PHPStan analyse command.
     test              --- Execute PHPUnit test cases.    
+    coverage          --- Execute PHPUnit test coverage. 
 ]
 ```
 
@@ -162,7 +163,7 @@ composer test
 #### xDebug debugger
 xDebug (the last version) is installed and ready to use. Check the config params in `/docker/extras/xdebug.ini`
 By default, these are the main critical parameters provided:
-+ [mode](https://xdebug.org/docs/all_settings#mode) = develop,debug
++ [mode](https://xdebug.org/docs/all_settings#mode) = develop,debug,coverage
 + [client_host*](https://xdebug.org/docs/all_settings#client_host) = host.docker.internal
 + [client_port](https://xdebug.org/docs/all_settings#client_port) = 9003
 + [idekey](https://xdebug.org/docs/all_settings#idekey) = PHPSTORM
