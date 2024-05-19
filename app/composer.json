@@ -84,6 +84,9 @@
     ],
     "test": [
       "docker exec -t php-fpm vendor/bin/phpunit --verbose"
+    ],
+    "coverage": [
+      "docker exec -t php-fpm vendor/bin/phpunit --coverage-text"
     ]
   },
   "conflict": {
