@@ -3,12 +3,16 @@
 ## Table of Contents
 
 - [Description](#description)
+  - [Strategy](#strategy)
+    - [Structure design](#design-and-principles)
+  - [Features](#features)
+  - [Improvements](#possible-improvements)
 - [Infrastructure](#infrastructure-used)
   - [Symfony Packages](#installed-symfony-packages)
 - [Getting Started](#getting-started)
-  - [Run using composer](#run-using-composer)
+  - [Run using composer (recommended)](#run-using-composer-recommended)
   - [Run using docker](#run-using-docker)
-    - [Next steps](#important)
+    - [Next steps (important!)](#important)
     - [nginx or apache](#note)
 - [How it works?](#how-it-works)
   - [API](#api)
@@ -19,6 +23,36 @@
 
 ## Description
 With this Docker-Symfony-Stack boilerplate, it's possible to set up a local development environment in seconds.
+
+***
+
+### Strategy
+Example: API implementation with Controller that calls a Services.
+
+#### Design and Principles
+Example: The project structure follows the **hexagonal architecture** of Application, Domain, and Infrastructure.
+
+Design patterns used:
+- Dependency Injection (**)
+- Entities (**)
+- Exception & Logging Handling
+
+Design principles used:
+- OOP
+- SOLID
+
+### Features
+The following key features are implemented
+
+#### System
+#### Project
+#### Good practices
+#### Logic
+#### Performance
+
+### Possible improvements
+
+***
 
 ## Infrastructure used
 * Symfony 7
@@ -47,7 +81,7 @@ Copy or rename the `.env.dist` files (for docker and symfony) to an environment 
 cp ./app/.env.dist ./app/.env && cp .env.dist .env
 ```
 
-### Run using composer
+### Run using composer (recommended)
 
 `composer run` commands are provided as **shortcuts**.
 
@@ -97,6 +131,8 @@ docker exec -t php-fpm php bin/console doctrine:database:create --env=test --no-
 docker exec -t php-fpm php bin/console doctrine:migrations:migrate --env=test --no-interaction
 ```
 
+##### Optional
+
 After booting the container, you can use this command to enter inside it and execute commands (the container's name is defined in the _**docker-compose.yml**_ file):
 ```
 docker exec -it $container_name bash
@@ -135,17 +171,10 @@ docker exec php-fpm php bin/console debug:router
 ```
 Provided endpoints are (Example):
 ```
-GET|HEAD  api/user/all                  List all users
-POST      api/user/create               Create a new user   
-PUT       api/user/{user}               Update user by ID
-DELETE    api/user/{user}               (Soft) Delete a user by ID
-GET|HEAD  api/user/{user}               Show user data by ID
-GET|HEAD  api/user/{user}/workentry     List all user WorkEntries by UserID
-
-POST      api/workentry/create          Create a new WorkEntry
-PUT       api/workentry/{workentry}     Update WorkEntry by ID
-DELETE    api/workentry/{workentry}     Delete WorkEntry by ID
-GET|HEAD  api/workentry/{workentry}     Show WorkEntry Data by ID
+  Name                      Method    Path                          Description
+ ------------------------- --------  ----------------------------- --------------------------------
+  task_x                    GET|POST /task/x                        Task
+  demo_x                    GET      /demo/x                        Demo
 ```
 
 #### PHPUnit Testing
