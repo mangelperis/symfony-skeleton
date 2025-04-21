@@ -19,13 +19,15 @@ services:
             - "443:443"
         networks:
             - symfony
+
     mariadb:
         env_file:
             - .env
         container_name: "${CONTAINER_NAME_PREFIX}-mariadb"
-        image: mariadb:11.1.4
+        build:
+            context: ./docker/mariadb
         volumes:
-            - ${PATH_TO_DB_DATA}:/var/lib/mysql:rw
+            - ${PATH_TO_DATA}/mariadb_data:/var/lib/mysql:rw
             - ./docker/mariadb/mariadb.cnf:/etc/mysql/my.cnf
             # CUSTOM Users Script to add your users (optional)
             #- ./docker/mariadb/config/users.sql:/docker-entrypoint-initdb.d/users.sql

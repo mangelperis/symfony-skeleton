@@ -1,13 +1,47 @@
 version: '3.8'
 
 services:
+    php-fpm:
+        env_file:
+            - .env
+        container_name: php-fpm
+        #extra_hosts REQUIRED in Linux for xdebug!!
+        extra_hosts:
+            - host.docker.internal:host-gateway
+        #######
+        build:
+            dockerfile: ./docker/php-fpm/Dockerfile
+        volumes:
+            - ${PATH_TO_SYMFONY_PROJECT}:/var/www
+            - ${PATH_TO_DATA}/php-fpm:/var/log/php-fpm/
+        networks:
+            - symfony
+
+    nginx:
+        env_file:
+            - .env
+        container_name: nginx
+        build:
+            context: ./docker/nginx
+        volumes:
+            - ${PATH_TO_SYMFONY_PROJECT}:/var/www
+            - ${PATH_TO_DATA}/nginx_logs:/var/log/nginx
+        ports:
+            - "80:80"
+            - "443:443"
+        depends_on:
+            - php-fpm
+        networks:
+            - symfony
+
     mariadb:
         env_file:
             - .env
         container_name: mariadb
-        image: mariadb:11.1.4
+        build:
+            context: ./docker/mariadb
         volumes:
-            - ${PATH_TO_DB_DATA}:/var/lib/mysql:rw
+            - ${PATH_TO_DATA}/mariadb_data:/var/lib/mysql:rw
             - ./docker/mariadb/mariadb.cnf:/etc/mysql/my.cnf
             # CUSTOM Users Script to add your users (optional)
             #- ./docker/mariadb/config/users.sql:/docker-entrypoint-initdb.d/users.sql
@@ -22,38 +56,6 @@ services:
         networks:
             - symfony
 
-    php-fpm:
-        env_file:
-            - .env
-        container_name: php-fpm
-        #extra_hosts REQUIRED in Linux for xdebug!!
-        extra_hosts:
-            - host.docker.internal:host-gateway
-        #######
-        build:
-            dockerfile: ./docker/php-fpm/Dockerfile
-        volumes:
-            - ${PATH_TO_SYMFONY_PROJECT}:/var/www
-            - ${FPM_LOG_DIR}:/var/log/php-fpm/
-        depends_on:
-            - mariadb
-        networks:
-            - symfony
-
-    nginx:
-        env_file:
-            - .env
-        container_name: nginx
-        build:
-            context: ./docker/nginx
-        volumes:
-            - ${PATH_TO_SYMFONY_PROJECT}:/var/www
-            - ${NGINX_LOG_DIR}:/var/log/nginx
-        ports:
-            - "80:80"
-            - "443:443"
-        networks:
-            - symfony
 #    redis:
 #        env_file:
 #            - .env
@@ -63,7 +65,7 @@ services:
 #        ports:
 #            - "6379:6379"
 #        volumes:
-#            - ${REDIS_DATA_DIR}:/data
+#            - ${PATH_TO_DATA}/redis:/data
 #        restart: always
 #        networks:
 #            - symfony
@@ -78,6 +80,7 @@ services:
 #            - "1080:1080"
 #        networks:
 #            - symfony
+
 #    adminer:
 #        env_file:
 #            - .env
@@ -87,5 +90,20 @@ services:
 #            - "8080:8080"
 #        networks:
 #            - symfony
+
+    elk-init:
+        container_name: elk-setup
+        env_file:
+            - .env
+        extends:
+            file: ./docker/elk/docker-compose.yml
+            service: setup
+
+#    elasticsearch:
+#        extends:
+#            file: ./docker/elk/docker-compose.yml
+#            service: elasticsearch
+
+
 networks:
     symfony:
