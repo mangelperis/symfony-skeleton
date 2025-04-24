@@ -7,18 +7,35 @@ use PHPUnit\Framework\TestCase;
 
 class Test extends TestCase
 {
-    public function testAdd()
+    private Calculator $calculator;
+    public function setUp(): void
+    {
+        $this->calculator = new Calculator();
+    }
+
+    public function testAdd(): void
+    {
+        $result = $this->calculator->add(a:2, b:3);
+        $this->assertEquals(5, $result);
+    }
+
+    public function testSub(): void
     {
         $calculator = new Calculator();
-        $result = $calculator->add(2, 3);
-        $this->assertEquals(5, $result);
+        $result = $calculator->substract(a:2, b:3);
+        $this->assertEquals(-1, $result);
     }
 }
 
 class Calculator
 {
-    public function add($a, $b)
+    public function add(int $a, int $b): int
     {
         return $a + $b;
+    }
+
+    public function substract(int $a, int $b): int
+    {
+     return $a - $b;
     }
 }
