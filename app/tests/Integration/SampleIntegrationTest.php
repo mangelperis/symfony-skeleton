@@ -1,10 +1,10 @@
 <?php
 
-namespace App\Tests;
+namespace App\Tests\Integration;
 
 use PHPUnit\Framework\TestCase;
 
-class SampleDummyTest extends TestCase
+class SampleIntegrationTest extends TestCase
 {
     private Calculator $calculator;
 
