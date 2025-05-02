@@ -57,7 +57,7 @@ The following key features are implemented
 ## Infrastructure used
 * Symfony 7
 * Docker
-  * PHP 8.3 (w/ opcache & [xDebug](#xdebug-debugger))
+  * PHP 8.4 (w/ opcache & [xDebug](#xdebug-debugger))
   * [Nginx / Apache](#note)
   * MariaDB 11.1.4
   * Redis 7.2.4 (optional)
