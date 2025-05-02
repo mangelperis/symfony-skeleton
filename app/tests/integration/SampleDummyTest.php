@@ -5,7 +5,7 @@ namespace App\Tests;
 use SampleTest;
 use PHPUnit\Framework\TestCase;
 
-class Test extends TestCase
+class SampleDummyTest extends TestCase
 {
     private Calculator $calculator;
     public function setUp(): void
