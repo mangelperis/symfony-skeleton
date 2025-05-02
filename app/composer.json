@@ -94,8 +94,8 @@
     "coverage": [
       "docker exec -t php-fpm vendor/bin/phpunit --coverage-text"
     ],
-    "fix-style": "docker exec -t php-fpm vendor/bin/php-cs-fixer fix",
-    "check-style": "docker exec -t php-fpm vendor/bin/php-cs-fixer fix --dry-run"
+    "fix-style": "docker exec -t php-fpm vendor/bin/php-cs-fixer fix src",
+    "check-style": "docker exec -t php-fpm vendor/bin/php-cs-fixer fix src --dry-run"
   },
   "conflict": {
     "symfony/symfony": "*"

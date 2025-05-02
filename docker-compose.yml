@@ -22,7 +22,7 @@ services:
         networks:
             - symfony
 
-    php-fpm:
+    php-fpm: #the hooks and other commands from the Makefile target this container name
         env_file:
             - .env
         container_name: php-fpm
