@@ -73,8 +73,8 @@ format:
 lint:
 	flake8 .
 
-typecheck:
-	mypy -p app
+stan:
+	docker exec php-fpm vendor/bin/phpstan analyse /var/www/src
 
 quality: format lint typecheck
 	@echo "All quality checks completed"

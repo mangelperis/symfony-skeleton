@@ -97,8 +97,8 @@ composer run [
     logs              --- Show container sys logs (php-fpm, nginx, and MariaDB).
     cache-clear       --- Execute Symfony clear cache command.
     stan              --- Execute PHPStan analyse command.
-    test              --- Execute PHPUnit test cases.    
-    coverage          --- Execute PHPUnit test coverage. 
+    test              --- Execute PHPUnit test cases.
+    coverage          --- Execute PHPUnit test coverage.
 ]
 ```
 
@@ -202,7 +202,7 @@ Please check the [official documentation](https://xdebug.org/docs/all_settings) 
 Add the call to `xdebug_info()` from any PHP file to show the info panel.
 
 ####  __client_host__ (*)
-Depending on your environment, it's **required** to add the following to the **_docker-composer.yml_** file to enable 
+Depending on your environment, it's **required** to add the following to the **_docker-composer.yml_** file to enable
 communication between the container and the host machine. By default, this is **ON**.
 ```
 extra_hosts:
@@ -215,5 +215,3 @@ accordingly.
 
 ## Troubleshooting
 Nothing else for now!
-
-
