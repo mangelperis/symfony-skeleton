@@ -21,6 +21,12 @@ services:
             - "3306:3306"
         networks:
             - symfony
+        healthcheck:
+            test: [ "CMD", "mysqladmin", "ping", "-h", "localhost", "-u", "root", "-p${ROOT_PASSWORD}" ]
+            interval: 15s
+            timeout: 5s
+            retries: 5
+            start_period: 30s
 
     php-fpm: #the hooks and other commands from the Makefile target this container name
         env_file:
@@ -39,6 +45,12 @@ services:
             - mariadb
         networks:
             - symfony
+        healthcheck:
+            test: [ "CMD", "php-fpm", "-t" ]
+            interval: 15s
+            timeout: 5s
+            retries: 3
+            start_period: 15s
 
     nginx:
         env_file:
@@ -54,6 +66,12 @@ services:
             - "443:443"
         networks:
             - symfony
+        healthcheck:
+            test: [ "CMD", "curl", "--fail", "http://localhost" ]
+            interval: 15s
+            timeout: 5s
+            retries: 3
+            start_period: 15s
 #    redis:
 #        env_file:
 #            - .env
@@ -67,6 +85,12 @@ services:
 #        restart: always
 #        networks:
 #            - symfony
+#        healthcheck:
+#            test: ["CMD", "redis-cli", "ping"]
+#            interval: 15s
+#            timeout: 5s
+#            retries: 3
+#            start_period: 15s
 
 #    mailer:
 #        env_file:
@@ -78,6 +102,13 @@ services:
 #            - "1080:1080"
 #        networks:
 #            - symfony
+#        healthcheck:
+#            test: ["CMD", "nc", "-z", "localhost", "1025"]
+#            interval: 15s
+#            timeout: 5s
+#            retries: 3
+#            start_period: 15s
+
 #    adminer:
 #        env_file:
 #            - .env
@@ -87,5 +118,11 @@ services:
 #            - "8080:8080"
 #        networks:
 #            - symfony
+#        healthcheck:
+#            test: ["CMD", "curl", "--fail", "http://localhost:8080"]
+#            interval: 15s
+#            timeout: 5s
+#            retries: 3
+#            start_period: 15s
 networks:
     symfony:
