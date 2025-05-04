@@ -1,4 +1,4 @@
-FROM nginx:1.25.0-alpine
+FROM nginx:1.27.5-alpine
 
 # Config Files
 COPY nginx.conf  /etc/nginx/nginx.conf
