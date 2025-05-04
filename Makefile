@@ -2,7 +2,7 @@ include .env
 include app/.env
 
 # ----------- VARIABLES ------------------------------------------------------------------------------------------------
-#TEST_COMPOSE_FILE := docker-compose-test.yml #test services compose file
+TEST_COMPOSE_FILE := docker-compose-test.yml #test services compose file
 
 # ----------- END VARIABLES --------------------------------------------------------------------------------------------
 # ----------- TESTING --------------------------------------------------------------------------------------------------
@@ -66,17 +66,16 @@ console:
 # ----------- END DOCKER -----------------------------------------------------------------------------------------------
 
 # ----------- BEGIN QUALITY TOOLS --------------------------------------------------------------------------------------
-format:
-	black .
-	isort .
+fixer:
+	docker exec php-fpm sh -c "PHP_CS_FIXER_IGNORE_ENV=1 vendor/bin/php-cs-fixer fix /var/www/src"
 
 lint:
-	flake8 .
+	docker exec php-fpm php -l /var/www/src
 
 stan:
 	docker exec php-fpm vendor/bin/phpstan analyse /var/www/src
 
-quality: format lint typecheck
+quality: fixer lint stan
 	@echo "All quality checks completed"
 
 precommit:
@@ -86,7 +85,11 @@ install-hooks:
 	pre-commit clean && \
 	pre-commit install
 
+cache:
+	docker exec -t php-fpm bin/console cache:clear
 # ----------- END QUALITY TOOLS ----------------------------------------------------------------------------------------
 
 # ----------- BEGIN PHONY ----------------------------------------------------------------------------------------------
-.PHONY:
+.PHONY: test-up test-down test-integration test-unit test-all up build force down ps clean logs console \
+		fixer lint stan quality precommit install-hooks cache
+# ----------- END PHONY ------------------------------------------------------------------------------------------------
