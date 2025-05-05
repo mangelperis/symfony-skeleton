@@ -128,7 +128,7 @@ services:
             MONGO_INITDB_ROOT_PASSWORD: ${MONGO_ROOT_PASSWORD}
             MONGO_INITDB_DATABASE: test
         healthcheck:
-            test: [ "CMD", "mongosh", "--host", "localhost", "--port", "27017",  "-u", "${MONGO_ROOT_USERNAME}", "-p", "${MONGO_ROOT_PASSWORD}", "admin", "--eval", "db.runCommand({ ping: 1 })" ]
+            test: ["CMD", "mongosh", "--eval", "db.adminCommand('ping')"]
             interval: 30s
             retries: 3
             start_period: 10s
