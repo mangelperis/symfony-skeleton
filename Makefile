@@ -101,6 +101,6 @@ cache:
 # ----------- END QUALITY TOOLS ----------------------------------------------------------------------------------------
 
 # ----------- BEGIN PHONY ----------------------------------------------------------------------------------------------
-.PHONY: test-up test-down test-integration test-unit test-all up build force down ps clean logs console \
+.PHONY: test-up test-down test-integration test-unit test-all coverage up build force down ps clean logs console \
 		fixer lint stan quality precommit install-hooks cache
 # ----------- END PHONY ------------------------------------------------------------------------------------------------
