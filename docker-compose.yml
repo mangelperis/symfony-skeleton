@@ -1,34 +1,6 @@
 version: '3.8'
-
 services:
-    mariadb:
-        env_file:
-            - .env
-        container_name: mariadb
-        image: mariadb:11.1.4
-        volumes:
-            - ${PATH_TO_DB_DATA}:/var/lib/mysql:rw
-            - ./docker/mariadb/mariadb.cnf:/etc/mysql/my.cnf
-            # CUSTOM Users Script to add your users (optional)
-            #- ./docker/mariadb/config/users.sql:/docker-entrypoint-initdb.d/users.sql
-        environment:
-            - MARIADB_ROOT_PASSWORD=${ROOT_PASSWORD}
-            - MARIADB_ALLOW_EMPTY_ROOT_PASSWORD=0
-            #  - MARIADB_USER=${DB_USER}
-            #  - MARIADB_PASSWORD=${DB_PASSWORD}
-            - MARIADB_DATABASE=${DB_NAME}
-        ports:
-            - "3306:3306"
-        networks:
-            - symfony
-        healthcheck:
-            test: [ "CMD", "mysqladmin", "ping", "-h", "localhost", "-u", "root", "-p${ROOT_PASSWORD}" ]
-            interval: 15s
-            timeout: 5s
-            retries: 5
-            start_period: 30s
-
-    php-fpm: #the hooks and other commands from the Makefile target this container name
+    php-fpm: # Warning!: the hooks and other commands from the Makefile target this specific container name
         env_file:
             - .env
         container_name: php-fpm
@@ -41,10 +13,6 @@ services:
         volumes:
             - ${PATH_TO_SYMFONY_PROJECT}:/var/www
             - ${FPM_LOG_DIR}:/var/log/php-fpm/
-        depends_on:
-            - mariadb
-        networks:
-            - symfony
         healthcheck:
             test: [ "CMD", "php-fpm", "-t" ]
             interval: 15s
@@ -58,71 +26,230 @@ services:
         container_name: nginx
         build:
             context: ./docker/nginx
+        depends_on:
+            -   php-fpm
         volumes:
             - ${PATH_TO_SYMFONY_PROJECT}:/var/www
             - ${NGINX_LOG_DIR}:/var/log/nginx
         ports:
             - "80:80"
             - "443:443"
-        networks:
-            - symfony
         healthcheck:
-            test: [ "CMD", "curl", "--fail", "http://localhost" ]
+            test: [ "CMD", "nginx", "-t" ]
             interval: 15s
             timeout: 5s
             retries: 3
             start_period: 15s
-#    redis:
-#        env_file:
-#            - .env
-#        build:
-#            context: ./docker/redis
-#        container_name: redis
-#        ports:
-#            - "6379:6379"
-#        volumes:
-#            - ${REDIS_DATA_DIR}:/data
-#        restart: always
-#        networks:
-#            - symfony
-#        healthcheck:
-#            test: ["CMD", "redis-cli", "ping"]
-#            interval: 15s
-#            timeout: 5s
-#            retries: 3
-#            start_period: 15s
 
-#    mailer:
-#        env_file:
-#            - .env
-#        container_name: "${CONTAINER_NAME_PREFIX}-mailer"
-#        image: schickling/mailcatcher
-#        ports:
-#            - "1025:1025"
-#            - "1080:1080"
-#        networks:
-#            - symfony
-#        healthcheck:
-#            test: ["CMD", "nc", "-z", "localhost", "1025"]
-#            interval: 15s
-#            timeout: 5s
-#            retries: 3
-#            start_period: 15s
+# Databases Section
+## SQL
+    mariadb:
+        env_file:
+            - .env
+        container_name: mariadb
+        image: mariadb:11.7.2
+        volumes:
+            - mysql_data:/var/lib/mysql:rw
+            - ./docker/mariadb/mariadb.cnf:/etc/mysql/my.cnf
+            # CUSTOM Users Script to add your users (optional)
+            #- ./docker/mariadb/config/users.sql:/docker-entrypoint-initdb.d/users.sql
+        environment:
+            - MARIADB_ROOT_PASSWORD=${ROOT_PASSWORD}
+            - MARIADB_ALLOW_EMPTY_ROOT_PASSWORD=0
+            #  - MARIADB_USER=${DB_USER}
+            #  - MARIADB_PASSWORD=${DB_PASSWORD}
+            - MARIADB_DATABASE=${DB_NAME}
+        ports:
+            - "3306:3306"
+        healthcheck:
+            test: [ "CMD", "healthcheck.sh", "--connect", "--innodb_initialized" ]
+            interval: 15s
+            timeout: 5s
+            retries: 5
+            start_period: 30s
 
-#    adminer:
-#        env_file:
-#            - .env
-#        container_name: "${CONTAINER_NAME_PREFIX}-adminer"
-#        image: adminer
-#        ports:
-#            - "8080:8080"
-#        networks:
-#            - symfony
-#        healthcheck:
-#            test: ["CMD", "curl", "--fail", "http://localhost:8080"]
-#            interval: 15s
-#            timeout: 5s
-#            retries: 3
-#            start_period: 15s
+    adminer:
+        container_name: "mysql-adminer"
+        image: adminer:latest
+        ports:
+            - "8080:8080"
+        depends_on:
+            -   mariadb
+        healthcheck:
+            test: [ "CMD", "curl", "--fail", "http://localhost:8080" ]
+            interval: 15s
+            timeout: 5s
+            retries: 3
+            start_period: 15s
+
+## NoSQL
+    redis:
+        image: redis:7.4.3
+        container_name: "redis"
+        ports:
+            - "6379:6379"
+        volumes:
+            - redis_data:/data
+        restart: unless-stopped
+        healthcheck:
+            test: ["CMD", "redis-cli", "ping"]
+            interval: 15s
+            timeout: 5s
+            retries: 3
+            start_period: 15s
+
+    redis-admin:
+        image: erikdubbelboer/phpredisadmin:latest
+        container_name: redis-admin
+        depends_on:
+            - redis
+        environment:
+            REDIS_1_HOST: redis
+            REDIS_1_PORT: 6379
+            # Optional authentication
+            # ADMIN_USER: admin
+            # ADMIN_PASS: admin
+        ports:
+            - "8082:80"
+        healthcheck:
+            test: ["CMD", "curl", "--fail", "http://localhost:80"]
+            interval: 15s
+            timeout: 5s
+            retries: 3
+            start_period: 15s
+
+    mongo:
+        image: mongo:8.0.9
+        container_name: "mongo"
+        ports:
+            - "27017:27017"
+        environment:
+            MONGO_INITDB_ROOT_USERNAME: ${MONGO_ROOT_USERNAME}
+            MONGO_INITDB_ROOT_PASSWORD: ${MONGO_ROOT_PASSWORD}
+            MONGO_INITDB_DATABASE: test
+        healthcheck:
+            test: [ "CMD", "mongosh", "--host", "localhost", "--port", "27017",  "-u", "${MONGO_ROOT_USERNAME}", "-p", "${MONGO_ROOT_PASSWORD}", "admin", "--eval", "db.runCommand({ ping: 1 })" ]
+            interval: 30s
+            retries: 3
+            start_period: 10s
+            timeout: 5s
+        volumes:
+            - mongo_data:/data/db
+
+    mongo-express:
+        image: mongo-express:1.0.2-20-alpine3.19
+        container_name: "mongo-express"
+        ports:
+            - "8084:8081"
+        depends_on:
+            - mongo
+        environment:
+            ME_CONFIG_MONGODB_URL: mongodb://${MONGO_ROOT_USERNAME}:${MONGO_ROOT_PASSWORD}@mongo:27017
+            ME_CONFIG_BASICAUTH: false
+        healthcheck:
+            test: [ "CMD", "wget", "--spider", "-q", "http://0.0.0.0:8081" ]
+            interval: 30s
+            timeout: 10s
+            retries: 3
+            start_period: 45s
+
+# Message Brokers
+    kafka-broker:
+        profiles: ["kafka"]
+        image: confluentinc/cp-kafka:7.9.0
+        container_name: kafka
+        ports:
+            - "29092:29092"
+            - "9092:9092"
+        environment:
+            KAFKA_NODE_ID: 1
+            KAFKA_PROCESS_ROLES: 'broker,controller'
+            KAFKA_CONTROLLER_QUORUM_VOTERS: '1@kafka:9093'
+            KAFKA_LISTENERS: PLAINTEXT://kafka:29092,PLAINTEXT_HOST://0.0.0.0:9092,CONTROLLER://kafka:9093
+            KAFKA_ADVERTISED_LISTENERS: PLAINTEXT://kafka:29092,PLAINTEXT_HOST://localhost:9092
+            KAFKA_LISTENER_SECURITY_PROTOCOL_MAP: PLAINTEXT:PLAINTEXT,PLAINTEXT_HOST:PLAINTEXT,CONTROLLER:PLAINTEXT
+            KAFKA_INTER_BROKER_LISTENER_NAME: PLAINTEXT
+            KAFKA_CONTROLLER_LISTENER_NAMES: CONTROLLER
+            KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR: 1
+            CLUSTER_ID: '1'
+#
+#            KAFKA_BROKER_ID: 1
+#            KAFKA_ZOOKEEPER_CONNECT: zookeeper:2181
+#            KAFKA_LISTENER_SECURITY_PROTOCOL_MAP: PLAINTEXT:PLAINTEXT,PLAINTEXT_HOST:PLAINTEXT
+#            KAFKA_ADVERTISED_LISTENERS: PLAINTEXT://kafka:29092,PLAINTEXT_HOST://localhost:9092
+#            KAFKA_INTER_BROKER_LISTENER_NAME: PLAINTEXT
+#            KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR: 1
+        volumes:
+            - kafka_data:/var/lib/kafka/data
+        healthcheck:
+            test: [ "CMD", "nc", "-z", "localhost", "9092" ]
+            interval: 30s
+            timeout: 5s
+            retries: 3
+            start_period: 30s
+
+    schema-registry:
+        profiles: ["kafka"]
+        image: confluentinc/cp-schema-registry:7.9.0
+        container_name: schema-registry
+        depends_on:
+            kafka-broker:
+                condition: service_healthy
+        ports:
+            - "8081:8081"
+        environment:
+            SCHEMA_REGISTRY_HOST_NAME: schema-registry
+            SCHEMA_REGISTRY_KAFKASTORE_BOOTSTRAP_SERVERS: kafka:29092
+        healthcheck:
+            test: [ "CMD", "curl", "-f", "http://localhost:8081/subjects" ]
+            interval: 30s
+            timeout: 10s
+            retries: 3
+            start_period: 30s
+
+    kafka-ui:
+        profiles: ["kafka"]
+        image: ghcr.io/kafbat/kafka-ui:latest
+        container_name: kafka-ui
+        ports:
+            - "8083:8080"
+        depends_on:
+            - kafka-broker
+            - schema-registry
+        volumes:
+            - ./docker/kafbat/kafka_ui_config.yaml:/etc/kafkaui/dynamic_config.yaml
+        environment:
+            DYNAMIC_CONFIG_ENABLED: "true"
+        healthcheck:
+            test: [ "CMD", "wget", "--spider", "-q", "http://localhost:8080/actuator/health" ]
+            interval: 30s
+            timeout: 10s
+            retries: 3
+            start_period: 45s
+
+# Other tools
+    mailer:
+        container_name: "${CONTAINER_NAME_PREFIX}-mailer"
+        image: schickling/mailcatcher:latest
+        ports:
+            - "1025:1025"
+            - "1080:1080"
+        healthcheck:
+            test: ["CMD-SHELL", "exit 0"]
+            interval: 15s
+            timeout: 5s
+            retries: 3
+            start_period: 15s
+
+# Docker Database Volumes
+volumes:
+    mysql_data:
+    mongo_data:
+    redis_data:
+    kafka_data:
+
+# Networks
 networks:
-    symfony:
+    default:
+        name: symfony
+        driver: bridge

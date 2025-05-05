@@ -37,6 +37,10 @@ endef
 up:
 	docker compose up -d
 
+# Start all containers in detached mode with kafka
+kafka:
+	docker compose --profile kafka up -d
+
 # Build all containers
 build:
 	docker compose build
@@ -45,9 +49,13 @@ build:
 force:
 	docker compose up -d --build --force-recreate
 
+# Force rebuild and recreate all containers including kafka
+force-kafka:
+	docker compose --profile kafka up -d --build --force-recreate
+
 # Stop all containers
 down:
-	docker compose down
+	docker compose --profile kafka down
 
 # Show running containers
 ps:
