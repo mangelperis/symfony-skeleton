@@ -1,0 +1,49 @@
+name: PHP Linting
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+on: [ push, pull_request ]
+
+
+jobs:
+  php-linters:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - name: Check out code
+        uses: actions/checkout@v4
+
+      - name: Set up PHP
+        uses: shivammathur/setup-php@v2
+        with:
+          php-version: "8.4"
+          coverage: none
+          tools: composer, php-cs-fixer, phpstan
+
+      - name: Cache Composer dependencies
+        uses: actions/cache@v4
+        with:
+          path: |
+            vendor
+            ~/.composer/cache
+          key: composer-${{ hashFiles('composer.lock') }}
+
+      - name: Install Composer dependencies
+        run: composer install --prefer-dist --no-progress --no-suggest
+
+      - name: PHP Syntax check
+        run: find src -name "*.php" -exec php -l {} \;
+
+      - name: PHP Coding Standards Fixer
+        run: |
+          # Use the project's config file
+          PHP_CS_FIXER_IGNORE_ENV=1 php-cs-fixer fix --dry-run --diff --config=app/.php-cs-fixer.dist.php app/src
+
+      - name: PHPStan Static Analysis
+        uses: php-actions/phpstan@v3
+        with:
+          path: app/src/
+          level: 6
+          configuration: app/phpstan.dist.neon
