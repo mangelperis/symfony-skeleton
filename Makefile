@@ -21,10 +21,13 @@ test-integration: test-up
 
 test-unit:
 	$(call print_verbose,"Running unit tests...")
-	# TODO: phpunit unit only
 	docker exec -t php-fpm vendor/bin/phpunit --testsuite unit
 
 test-all: test-unit test-integration
+
+coverage:
+	$(call print_verbose,"Generating coverage report...")
+	docker exec -t php-fpm vendor/bin/phpunit --coverage-text
 # ----------- END TESTING ----------------------------------------------------------------------------------------------
 
 # Function to print messages based on VERBOSE
