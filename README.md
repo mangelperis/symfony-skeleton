@@ -1,3 +1,11 @@
+[![PHP Version](https://img.shields.io/badge/PHP-8.4-blue.svg)](https://www.php.net/)
+[![Symfony](https://img.shields.io/badge/Symfony-7.2.6-green.svg)](https://symfony.com/)
+[![Nginx](https://img.shields.io/badge/Nginx-1.27.5-009639.svg)](https://hub.docker.com/_/nginx)
+[![MariaDB](https://img.shields.io/badge/MariaDB-11.7.2-003545.svg)](https://mariadb.com/)
+[![Redis](https://img.shields.io/badge/Redis-7.4.3-DC382D.svg)](https://www.docker.com/blog/how-to-use-the-redis-docker-official-image/)
+[![Kafka](https://img.shields.io/badge/Kafka-7.9.0-231F20.svg)](https://github.com/wurstmeister/kafka-docker)
+[![MongoDB](https://img.shields.io/badge/MongoDB-8.0.9-47A248.svg)](https://hub.docker.com/_/mongo)
+[![License](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 # PHP & Symfony Docker Stack
 
 ## Table of Contents
