@@ -6,3 +6,6 @@ parameters:
         - public/
         - src/
         - tests/
+    excludePaths:
+        analyse:
+            - src/Shared/Infrastructure/Bus/SymfonyMessenger/*
