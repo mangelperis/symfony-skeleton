@@ -19,6 +19,8 @@ services:
             - '../src/DependencyInjection/'
             - '../src/Entity/'
             - '../src/Kernel.php'
+            - '../src/Shared/Infrastructure/Persistence/Doctrine/Repository/WriteRepository.php'
+            - '../src/Shared/Infrastructure/Persistence/Doctrine/Repository/ReadRepository.php'
 
 
     # add more service definitions when explicit configuration is needed
