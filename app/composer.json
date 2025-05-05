@@ -1,27 +1,32 @@
 {
+  "name": "yourvendor/project-name",
+  "description": "A brief description of your project",
   "type": "project",
   "license": "proprietary",
   "minimum-stability": "stable",
   "prefer-stable": true,
   "require": {
-    "php": ">=8.2",
+    "php": ">=8.4",
     "ext-ctype": "*",
     "ext-iconv": "*",
     "doctrine/dbal": "^3",
     "doctrine/doctrine-bundle": "^2.11",
     "doctrine/doctrine-migrations-bundle": "^3.3",
     "doctrine/orm": "^3.1",
-    "symfony/console": "7.0.*",
-    "symfony/dotenv": "7.0.*",
+    "symfony/console": "7.2.*",
+    "symfony/dotenv": "7.2.*",
     "symfony/flex": "^2",
-    "symfony/framework-bundle": "7.0.*",
-    "symfony/http-client": "7.0.*",
+    "symfony/framework-bundle": "7.2.*",
+    "symfony/http-client": "7.2.*",
     "symfony/monolog-bundle": "^3.10",
-    "symfony/runtime": "7.0.*",
-    "symfony/validator": "7.0.*",
-    "symfony/yaml": "7.0.*"
+    "symfony/runtime": "7.2.*",
+    "symfony/validator": "7.2.*",
+    "symfony/yaml": "7.2.*"
   },
   "config": {
+    "platform": {
+      "php": "8.4.0"
+    },
     "allow-plugins": {
       "php-http/discovery": true,
       "symfony/flex": true,
@@ -47,7 +52,8 @@
     "symfony/polyfill-php74": "*",
     "symfony/polyfill-php80": "*",
     "symfony/polyfill-php81": "*",
-    "symfony/polyfill-php82": "*"
+    "symfony/polyfill-php82": "*",
+    "symfony/polyfill-php83": "*"
   },
   "scripts": {
     "auto-scripts": {
@@ -83,11 +89,13 @@
       "docker exec -t php-fpm vendor/bin/phpstan analyse"
     ],
     "test": [
-      "docker exec -t php-fpm vendor/bin/phpunit --verbose"
+      "docker exec -t php-fpm vendor/bin/phpunit"
     ],
     "coverage": [
       "docker exec -t php-fpm vendor/bin/phpunit --coverage-text"
-    ]
+    ],
+    "fix-style": "docker exec -t php-fpm vendor/bin/php-cs-fixer fix src",
+    "check-style": "docker exec -t php-fpm vendor/bin/php-cs-fixer fix src --dry-run"
   },
   "conflict": {
     "symfony/symfony": "*"
@@ -95,17 +103,18 @@
   "extra": {
     "symfony": {
       "allow-contrib": false,
-      "require": "7.0.*"
+      "require": "7.2.*"
     }
   },
   "require-dev": {
     "doctrine/doctrine-fixtures-bundle": "^3.5",
+    "friendsofphp/php-cs-fixer": "^3.75",
     "phpstan/phpstan": "^1.10",
     "phpstan/phpstan-symfony": "^1.3",
-    "phpunit/phpunit": "^11",
-    "symfony/browser-kit": "7.0.*",
-    "symfony/css-selector": "7.0.*",
+    "phpunit/phpunit": "^12",
+    "symfony/browser-kit": "7.2.*",
+    "symfony/css-selector": "7.2.*",
     "symfony/maker-bundle": "^1.56",
-    "symfony/phpunit-bridge": "^7.0"
+    "symfony/phpunit-bridge": "^7.2"
   }
 }

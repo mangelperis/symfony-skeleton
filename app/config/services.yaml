@@ -19,6 +19,8 @@ services:
             - '../src/DependencyInjection/'
             - '../src/Entity/'
             - '../src/Kernel.php'
+            - '../src/Shared/Infrastructure/Persistence/Doctrine/Repository/WriteRepository.php'
+            - '../src/Shared/Infrastructure/Persistence/Doctrine/Repository/ReadRepository.php'
 
 
     # add more service definitions when explicit configuration is needed
@@ -26,3 +28,10 @@ services:
     App\Controller\:
         resource: '../src/Controller/'
         tags: ['controller.service_arguments']
+
+    # Symfony Messenger
+#    App\Shared\Application\Bus\Command\CommandBus:
+#        alias: App\Shared\Infrastructure\Bus\SymfonyMessenger\Command\MessengerCommandBus
+#
+#    App\Shared\Application\Bus\Query\QueryBus:
+#        alias: App\Shared\Infrastructure\Bus\SymfonyMessenger\Query\MessengerQueryBus

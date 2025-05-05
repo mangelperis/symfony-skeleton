@@ -1,0 +1,34 @@
+repos:
+  - repo: https://github.com/pre-commit/pre-commit-hooks
+    rev: v4.6.0
+    hooks:
+      - id: trailing-whitespace
+      - id: end-of-file-fixer
+      - id: check-yaml
+      - id: check-merge-conflict
+
+  - repo: local
+    hooks:
+      - id: php-lint
+        name: PHP Syntax check
+        description: Run `php -l` inside a Docker container
+        entry: bash -c 'docker exec php-fpm php -l /var/www/src/${FILE#app/src/}'
+        language: system
+        files: ^app/src/.*\.php$
+        pass_filenames: false
+
+      - id: php-cs-fixer
+        name: PHP Coding Standards Fixer
+        description: Run `php-cs-fixer` inside a Docker container
+        entry: docker exec php-fpm sh -c "PHP_CS_FIXER_IGNORE_ENV=1 vendor/bin/php-cs-fixer fix /var/www/src"
+        language: system
+        files: ^app/src/.*\.php$
+        pass_filenames: false
+
+      - id: phpstan
+        name: PHP Static Analysis Tool
+        description: Run `phpstan` inside a Docker container
+        entry: docker exec php-fpm vendor/bin/phpstan analyse /var/www/src
+        language: system
+        files: ^app/src/.*\.php$
+        pass_filenames: false
