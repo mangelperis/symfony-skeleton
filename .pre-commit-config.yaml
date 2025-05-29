@@ -7,17 +7,21 @@ repos:
       - id: check-yaml
       - id: check-merge-conflict
 
-  # JavaScript validation
   - repo: https://github.com/pre-commit/mirrors-eslint
     rev: v9.27.0
     hooks:
       - id: eslint
-        files: \.(js|jsx)$
-        types: [ file ]
+        files: \.(js|jsx|php|phtml)$
+        types: [file]
         additional_dependencies:
           - eslint@8.57.0
           - eslint-config-standard@17.1.0
-        args: [ '--fix' ]  # Optional: auto-fix some errors
+          - eslint-plugin-standard@5.0.0
+          - eslint-plugin-promise@6.1.1
+          - eslint-plugin-import@2.29.1
+          - eslint-plugin-node@11.1.0
+          - eslint-plugin-html@7.1.0
+        args: ['--fix']
 
   - repo: local
     hooks:
